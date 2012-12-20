@@ -45,12 +45,12 @@ public class HazelcastWrapper implements CacheWrapper {
 
    @Override
    public void tearDown() throws Exception {
-      Hazelcast.shutdown();
+      hazelcastInstance.getLifecycleService().shutdown();
    }
 
    @Override
    public boolean isRunning() {
-      return true;
+      return hazelcastInstance.getLifecycleService().isRunning();
    }
 
    @Override
