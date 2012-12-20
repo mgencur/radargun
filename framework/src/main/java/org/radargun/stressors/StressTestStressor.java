@@ -442,7 +442,7 @@ public class StressTestStressor extends AbstractCacheWrapperStressor {
          try {
             cacheWrapper.startTransaction();
          } catch (Exception e) {
-            log.error("Cannot start transaction");
+            log.error("Cannot start transaction", e);
          }
          return true;
       }

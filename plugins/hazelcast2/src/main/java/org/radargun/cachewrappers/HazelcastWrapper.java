@@ -15,6 +15,9 @@ import java.util.Map;
 
 /**
  *
+ * An implementation of CacheWrapper that uses Hazelcast instance as an underlying implementation.
+ * @author Martin Gencur
+ *
  */
 public class HazelcastWrapper implements CacheWrapper {
 
@@ -33,6 +36,7 @@ public class HazelcastWrapper implements CacheWrapper {
       InputStream configStream = getAsInputStreamFromClassLoader(config);
       Config cfg = new XmlConfigBuilder(configStream).build();
       hazelcastInstance = Hazelcast.newHazelcastInstance(cfg);
+      log.info("Hazelcast configuration:" + hazelcastInstance.getConfig().toString());
       hazelcastMap = hazelcastInstance.getMap(mapName);
       tx = hazelcastInstance.getTransaction();
    }
@@ -66,19 +70,18 @@ public class HazelcastWrapper implements CacheWrapper {
    @Override
    public Object remove(String bucket, Object key) throws Exception {
       if (trace) log.trace("REMOVE key=" + key);
-      hazelcastMap.remove(key);
-      return null;  //To change body of implemented methods use File | Settings | File Templates.
+      return hazelcastMap.remove(key);
    }
 
    @Override
    public void empty() throws Exception {
       hazelcastMap.clear();
-      //To change body of implemented methods use File | Settings | File Templates.
    }
 
    @Override
    public int getNumMembers() {
-      return Hazelcast.getAllHazelcastInstances().size();
+      if (trace) log.trace("Cluster size=" + hazelcastInstance.getCluster().getMembers().size());
+      return hazelcastInstance.getCluster().getMembers().size();
    }
 
    @Override
@@ -115,12 +118,14 @@ public class HazelcastWrapper implements CacheWrapper {
 
    @Override
    public int getLocalSize() {
+      //TODO Find out whether hazelcastMap.size() returns total size or local size
       return hazelcastMap.size();
    }
 
    @Override
    public int getTotalSize() {
-      return 0;
+      //TODO Find out whether hazelcastMap.size() returns total size or local size
+      return -1;
    }
 
    private InputStream getAsInputStreamFromClassLoader(String filename) {
