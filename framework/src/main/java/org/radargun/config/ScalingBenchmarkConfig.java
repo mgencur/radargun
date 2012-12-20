@@ -69,6 +69,9 @@ public class ScalingBenchmarkConfig extends FixedSizeBenchmarkConfig {
    private void initialize() {
       if (!initialized) {
          log.info("Initializing.  Starting with " + initSize + " nodes, up to "+ getMaxSize() + " nodes, incrementing by " + increment);
+         if (initSize == getMaxSize() && increment == 0) {
+            increment = 1; //prevent infinite loop when users intuitively specify increment = 0 when testing only one cluster size
+         }
          for (int i = initSize; i <= getMaxSize(); i+=increment) {
             log.info("Initializing configuration with " + i + " nodes");
             FixedSizeBenchmarkConfig conf = new FixedSizeBenchmarkConfig();
