@@ -26,7 +26,6 @@ public class HazelcastWrapper implements CacheWrapper {
 
    private static final String DEFAULT_MAP_NAME = "default";
    protected HazelcastInstance hazelcastInstance;
-   protected Transaction tx;
    protected Map<Object, Object> hazelcastMap;
 
    @Override
@@ -38,7 +37,6 @@ public class HazelcastWrapper implements CacheWrapper {
       hazelcastInstance = Hazelcast.newHazelcastInstance(cfg);
       log.info("Hazelcast configuration:" + hazelcastInstance.getConfig().toString());
       hazelcastMap = hazelcastInstance.getMap(mapName);
-      tx = hazelcastInstance.getTransaction();
    }
 
    protected String getMapName(TypedProperties confAttributes) {
@@ -97,7 +95,7 @@ public class HazelcastWrapper implements CacheWrapper {
    @Override
    public void startTransaction() {
       try {
-         tx.begin();
+         hazelcastInstance.getTransaction().begin();
       } catch (Exception e) {
          throw new RuntimeException(e);
       }
@@ -107,9 +105,9 @@ public class HazelcastWrapper implements CacheWrapper {
    public void endTransaction(boolean successful) {
       try {
          if (successful) {
-            tx.commit();
+            hazelcastInstance.getTransaction().commit();
          } else {
-            tx.rollback();
+            hazelcastInstance.getTransaction().rollback();
          }
       } catch (Exception e) {
          throw new RuntimeException(e);
