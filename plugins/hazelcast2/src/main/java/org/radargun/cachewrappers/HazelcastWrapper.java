@@ -79,7 +79,10 @@ public class HazelcastWrapper implements CacheWrapper {
    @Override
    public int getNumMembers() {
       if (trace) log.trace("Cluster size=" + hazelcastInstance.getCluster().getMembers().size());
-      return hazelcastInstance.getCluster().getMembers().size();
+      if (!hazelcastInstance.getLifecycleService().isRunning())
+         return -1;
+      else
+         return hazelcastInstance.getCluster().getMembers().size();
    }
 
    @Override
