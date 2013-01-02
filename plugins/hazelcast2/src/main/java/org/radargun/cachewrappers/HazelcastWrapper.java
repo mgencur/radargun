@@ -119,14 +119,12 @@ public class HazelcastWrapper implements CacheWrapper {
 
    @Override
    public int getLocalSize() {
-      //TODO Find out whether hazelcastMap.size() returns total size or local size
-      return hazelcastMap.size();
+      return -1; //not supported by Hazelcast, local size can be monitored through Hazelcast management center (web GUI)
    }
 
    @Override
    public int getTotalSize() {
-      //TODO Find out whether hazelcastMap.size() returns total size or local size
-      return -1;
+      return hazelcastMap.size();
    }
 
    private InputStream getAsInputStreamFromClassLoader(String filename) {
