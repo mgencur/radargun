@@ -16,6 +16,14 @@
          </li>
       </#list>
    </ul>
+   <h2>Timelines</h2>
+      <ul>
+         <#list reporter.reports as report>
+            <li>
+               <a href="timeline_${report.configuration.name}_${report.cluster.clusterIndex}.html">${report.configuration.name} on ${report.cluster}</a>
+            </li>
+         </#list>
+      </ul>
    <h2>Configurations</h2>
       The benchmark was executed on following configurations and cluster sizes: <br/>
    <ul>
@@ -120,14 +128,6 @@
             </li>
          </#list>
       </#if>
-   </ul>
-   <h2>Timelines</h2>
-   <ul>
-      <#list reporter.reports as report>
-         <li>
-            <a href="timeline_${report.configuration.name}_${report.cluster.clusterIndex}.html">${report.configuration.name} on ${report.cluster}</a>
-         </li>
-      </#list>
    </ul>
    <hr/>
    Generated on ${.now} by RadarGun
