@@ -56,11 +56,11 @@ public class NetworkBytesMonitor implements Monitor {
                   long now = System.currentTimeMillis();
                   String[] vals = line.split(":")[1].trim().split("\\s+");
                   if (previousValue == 0) {
-                     timeline.addValue(getCategory(), new Timeline.Value(0));
+                     timeline.addEvent(getCategory(), new Timeline.ValueEvent(0));
                   } else {
                      long bytesSinceLastTime = Long.valueOf(vals[valueIndex]) - previousValue;
                      long trafficPerSecond = bytesSinceLastTime * TimeUnit.SECONDS.toMillis(1) / (now - previousTime);
-                     timeline.addValue(getCategory(), new Timeline.Value(trafficPerSecond));
+                     timeline.addEvent(getCategory(), new Timeline.ValueEvent(trafficPerSecond));
                   }
                   previousValue = Long.valueOf(vals[valueIndex]);
                   previousTime = now;

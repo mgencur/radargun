@@ -95,11 +95,11 @@ public class TimelineChart {
       long[] maxTimestamps = new long[MAX_EVENT_VALUES];
       //long lastTimestamp = Long.MIN_VALUE;
       for (Timeline.Event event : events) {
-         if (event instanceof Timeline.Value) {
+         if (event instanceof Timeline.ValueEvent) {
             if (event.timestamp > this.endTimestamp) {
                throw new IllegalStateException(String.format("Current timestamp %d is bigger then end timestamp %d", event.timestamp, this.endTimestamp));
             }
-            Timeline.Value value = (Timeline.Value) event;
+            Timeline.ValueEvent value = (Timeline.ValueEvent) event;
             int bucket = (int) ((event.timestamp - startTimestamp) * (MAX_EVENT_VALUES-1) / (this.endTimestamp - startTimestamp));
             if (minValues[bucket] == null) {
                minValues[bucket] = value.value;

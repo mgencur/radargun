@@ -18,7 +18,6 @@ public class Timeline implements Serializable, Comparable<Timeline> {
 
    public final int slaveIndex;
    private Map<String, List<Event>> events = new HashMap<String, List<Event>>();
-   private Map<String, List<Value>> values = new HashMap<String, List<Value>>();
    private long firstTimestamp = Long.MAX_VALUE;
    private long lastTimestamp = Long.MIN_VALUE;
 
@@ -26,29 +25,11 @@ public class Timeline implements Serializable, Comparable<Timeline> {
       this.slaveIndex = slaveIndex;
    }
 
-   public void addEvent(String category, IntervalEvent e) {
-      addEvent(category, (Event) e);
-   }
-
-   public void addEvent(String category, TextEvent e) {
-      addEvent(category, (Event) e);
-   }
-
-   private synchronized void addEvent(String category, Event e) {
+   public synchronized void addEvent(String category, Event e) {
       List<Event> cat = events.get(category);
       if (cat == null) {
          cat = new ArrayList<Event>();
          events.put(category, cat);
-      }
-      cat.add(e);
-      updateTimestamps(e);
-   }
-
-   public synchronized void addValue(String category, Value e) {
-      List<Value> cat = values.get(category);
-      if (cat == null) {
-         cat = new ArrayList<Value>();
-         values.put(category, cat);
       }
       cat.add(e);
       updateTimestamps(e);
@@ -63,16 +44,8 @@ public class Timeline implements Serializable, Comparable<Timeline> {
       return events.keySet();
    }
 
-   public synchronized Set<String> getValueCategories() {
-      return values.keySet();
-   }
-
    public synchronized List<Event> getEvents(String category) {
       return events.get(category);
-   }
-
-   public synchronized List<Value> getValues(String category) {
-      return values.get(category);
    }
 
    public long getFirstTimestamp() {
@@ -86,6 +59,13 @@ public class Timeline implements Serializable, Comparable<Timeline> {
    @Override
    public int compareTo(Timeline o) {
       return Integer.compare(slaveIndex, o.slaveIndex);
+   }
+
+   public enum EventType {
+      /* All events related to system resources (CPU, memory, network, etc.) */
+      SYSMONITOR,
+      /* Any other type of events, e.g. recording values in background stages */
+      CUSTOM
    }
 
    /**
@@ -119,15 +99,15 @@ public class Timeline implements Serializable, Comparable<Timeline> {
    /**
     * Event that presents a sequence of changing values, such as CPU utilization
     */
-   public static class Value extends Event {
+   public static class ValueEvent extends Event {
       public final Number value;
 
-      public Value(long timestamp, Number value) {
+      public ValueEvent(long timestamp, Number value) {
          super(timestamp);
          this.value = value;
       }
 
-      public Value(Number value) {
+      public ValueEvent(Number value) {
          this.value = value;
       }
 

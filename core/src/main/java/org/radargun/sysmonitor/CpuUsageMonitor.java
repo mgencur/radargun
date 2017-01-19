@@ -46,7 +46,7 @@ public class CpuUsageMonitor extends JmxMonitor {
          long procTimeDiff = (cpuTime - prevCpuTime) / procCount; // already in nanoseconds
          double cpuUsage = Math.min(1d, Math.max(0d, (double) procTimeDiff / (double) upTimeDiff));
 
-         timeline.addValue(CPU_USAGE, new Timeline.Value(cpuUsage));
+         timeline.addEvent(CPU_USAGE, new Timeline.ValueEvent(cpuUsage));
          log.tracef("Current CPU usage: %.1f%%", 100 * cpuUsage);
          prevCpuTime = cpuTime;
          prevUpTime = upTime;
@@ -58,12 +58,12 @@ public class CpuUsageMonitor extends JmxMonitor {
    @Override
    public synchronized void start() {
       super.start();
-      timeline.addValue(CPU_USAGE, new Timeline.Value(0));
+      timeline.addEvent(CPU_USAGE, new Timeline.ValueEvent(0));
    }
 
    @Override
    public synchronized void stop() {
       super.stop();
-      timeline.addValue(CPU_USAGE, new Timeline.Value(0));
+      timeline.addEvent(CPU_USAGE, new Timeline.ValueEvent(0));
    }
 }

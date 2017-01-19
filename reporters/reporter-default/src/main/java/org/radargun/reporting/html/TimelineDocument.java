@@ -54,16 +54,16 @@ public class TimelineDocument extends HtmlDocument {
             }
          }
 
-         for (String category : timeline.getValueCategories()) {
+         for (String category : timeline.getEventCategories()) {
             if (!valueCategories.containsKey(category)) {
                valueCategories.put(category, valueCategories.size());
             }
 
-            List<Timeline.Value> events = timeline.getValues(category);
+            List<Timeline.Event> events = timeline.getEvents(category);
             double min = Long.MAX_VALUE, max = Long.MIN_VALUE;
             for (Timeline.Event event : events) {
-               if (event instanceof Timeline.Value) {
-                  double d = ((Timeline.Value) event).value.doubleValue();
+               if (event instanceof Timeline.ValueEvent) {
+                  double d = ((Timeline.ValueEvent) event).value.doubleValue();
                   max = Math.max(max, d);
                   min = Math.min(min, d);
                }
@@ -122,8 +122,8 @@ public class TimelineDocument extends HtmlDocument {
          /* Charts */
          final AtomicBoolean firstRange = new AtomicBoolean(true);
          for (Timeline timeline : timelines) {
-            List<Timeline.Value> categoryValues = timeline.getValues(valueCategory);
-            final List<Timeline.Value> values = categoryValues != null ? categoryValues : Collections.EMPTY_LIST;
+            List<Timeline.Event> categoryEvents = timeline.getEvents(valueCategory);
+            final List<Timeline.Event> values = categoryEvents != null ? categoryEvents : Collections.EMPTY_LIST;
             final int slaveIndex = timeline.slaveIndex;
             final String valueChartFile = getValueChartFile(valueCategoryId, slaveIndex);
 

@@ -242,10 +242,10 @@ public class CsvReporter implements Reporter {
    }
 
    private static class ValueAndSlave implements Comparable<ValueAndSlave> {
-      Timeline.Value value;
+      Timeline.ValueEvent value;
       int slaveIndex;
 
-      private ValueAndSlave(Timeline.Value value, int slaveIndex) {
+      private ValueAndSlave(Timeline.ValueEvent value, int slaveIndex) {
          this.value = value;
          this.slaveIndex = slaveIndex;
       }
@@ -261,7 +261,7 @@ public class CsvReporter implements Reporter {
       Set<String> allCategories = new HashSet<String>();
       int maxSlaveIndex = 0;
       for (Timeline t : report.getTimelines()) {
-         allCategories.addAll(t.getValueCategories());
+         allCategories.addAll(t.getEventCategories());
          maxSlaveIndex = Math.max(maxSlaveIndex, t.slaveIndex);
       }
       for (String valueCategory : allCategories) {
@@ -276,11 +276,13 @@ public class CsvReporter implements Reporter {
             writer.write('\n');
             List<ValueAndSlave> values = new ArrayList<ValueAndSlave>();
             for (Timeline t : report.getTimelines()) {
-               List<Timeline.Value> list = t.getValues(valueCategory);
+               List<Timeline.Event> list = t.getEvents(valueCategory);
                if (list == null)
                   continue;
-               for (Timeline.Value v : list) {
-                  values.add(new ValueAndSlave(v, t.slaveIndex));
+               for (Timeline.Event e : list) {
+                  if (e instanceof Timeline.ValueEvent) {
+                     values.add(new ValueAndSlave((Timeline.ValueEvent) e, t.slaveIndex));
+                  }
                }
             }
             Collections.sort(values);
