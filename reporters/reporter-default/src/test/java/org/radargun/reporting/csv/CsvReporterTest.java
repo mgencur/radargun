@@ -48,20 +48,20 @@ public class CsvReporterTest {
          cluster2.setSize(3);
 
          Timeline timeline1 = new Timeline(0);
-         timeline1.addEvent("event1", new Timeline.ValueEvent(0, 1));
-         timeline1.addEvent("event1", new Timeline.ValueEvent(1000, 2));
-         timeline1.addEvent("event2", new Timeline.ValueEvent(0, 1));
-         timeline1.addEvent("event2", new Timeline.ValueEvent(1000, 2));
+         timeline1.addEvent(Timeline.Category.sysCategory("event1"), new Timeline.ValueEvent(0, 1));
+         timeline1.addEvent(Timeline.Category.sysCategory("event1"), new Timeline.ValueEvent(1000, 2));
+         timeline1.addEvent(Timeline.Category.sysCategory("event2"), new Timeline.ValueEvent(0, 1));
+         timeline1.addEvent(Timeline.Category.sysCategory("event2"), new Timeline.ValueEvent(1000, 2));
          Timeline timeline2 = new Timeline(1);
-         timeline2.addEvent("event1", new Timeline.ValueEvent(0, 1));
-         timeline2.addEvent("event1", new Timeline.ValueEvent(1000, 2));
-         timeline2.addEvent("event2", new Timeline.ValueEvent(0, 1));
-         timeline2.addEvent("event2", new Timeline.ValueEvent(1000, 2));
+         timeline2.addEvent(Timeline.Category.sysCategory("event1"), new Timeline.ValueEvent(0, 1));
+         timeline2.addEvent(Timeline.Category.sysCategory("event1"), new Timeline.ValueEvent(1000, 2));
+         timeline2.addEvent(Timeline.Category.sysCategory("event2"), new Timeline.ValueEvent(0, 1));
+         timeline2.addEvent(Timeline.Category.sysCategory("event2"), new Timeline.ValueEvent(1000, 2));
          Timeline timeline3 = new Timeline(2);
-         timeline3.addEvent("event1", new Timeline.ValueEvent(0, 1));
-         timeline3.addEvent("event1", new Timeline.ValueEvent(1000, 2));
-         timeline3.addEvent("event2", new Timeline.ValueEvent(0, 1));
-         timeline3.addEvent("event2", new Timeline.ValueEvent(1000, 2));
+         timeline3.addEvent(Timeline.Category.sysCategory("event1"), new Timeline.ValueEvent(0, 1));
+         timeline3.addEvent(Timeline.Category.sysCategory("event1"), new Timeline.ValueEvent(1000, 2));
+         timeline3.addEvent(Timeline.Category.sysCategory("event2"), new Timeline.ValueEvent(0, 1));
+         timeline3.addEvent(Timeline.Category.sysCategory("event2"), new Timeline.ValueEvent(1000, 2));
 
 
          Operation operation1 = Operation.register("op1");

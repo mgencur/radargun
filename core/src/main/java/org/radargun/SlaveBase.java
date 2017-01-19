@@ -101,7 +101,7 @@ public abstract class SlaveBase {
                } finally {
                   InitHelper.destroy(stage);
                }
-               state.getTimeline().addEvent(Stage.STAGE, new Timeline.IntervalEvent(start, stageName, end - start));
+               state.getTimeline().addEvent(Timeline.Category.customCategory(Stage.STAGE), new Timeline.IntervalEvent(start, stageName, end - start));
             }
             sendResponse(response);
          }

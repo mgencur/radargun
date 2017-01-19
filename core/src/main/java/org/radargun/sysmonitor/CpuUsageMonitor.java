@@ -5,6 +5,7 @@ import java.lang.management.OperatingSystemMXBean;
 import java.util.concurrent.TimeUnit;
 
 import org.radargun.reporting.Timeline;
+import org.radargun.reporting.Timeline.Category;
 import org.radargun.traits.JmxConnectionProvider;
 
 /**
@@ -46,7 +47,7 @@ public class CpuUsageMonitor extends JmxMonitor {
          long procTimeDiff = (cpuTime - prevCpuTime) / procCount; // already in nanoseconds
          double cpuUsage = Math.min(1d, Math.max(0d, (double) procTimeDiff / (double) upTimeDiff));
 
-         timeline.addEvent(CPU_USAGE, new Timeline.ValueEvent(cpuUsage));
+         timeline.addEvent(Timeline.Category.sysCategory(CPU_USAGE), new Timeline.ValueEvent(cpuUsage));
          log.tracef("Current CPU usage: %.1f%%", 100 * cpuUsage);
          prevCpuTime = cpuTime;
          prevUpTime = upTime;
@@ -58,12 +59,12 @@ public class CpuUsageMonitor extends JmxMonitor {
    @Override
    public synchronized void start() {
       super.start();
-      timeline.addEvent(CPU_USAGE, new Timeline.ValueEvent(0));
+      timeline.addEvent(Category.sysCategory(CPU_USAGE), new Timeline.ValueEvent(0));
    }
 
    @Override
    public synchronized void stop() {
       super.stop();
-      timeline.addEvent(CPU_USAGE, new Timeline.ValueEvent(0));
+      timeline.addEvent(Category.sysCategory(CPU_USAGE), new Timeline.ValueEvent(0));
    }
 }

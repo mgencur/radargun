@@ -17,7 +17,7 @@ import org.radargun.utils.TimeService;
 public class Timeline implements Serializable, Comparable<Timeline> {
 
    public final int slaveIndex;
-   private Map<String, List<Event>> events = new HashMap<String, List<Event>>();
+   private Map<Category, List<Event>> events = new HashMap<Category, List<Event>>();
    private long firstTimestamp = Long.MAX_VALUE;
    private long lastTimestamp = Long.MIN_VALUE;
 
@@ -25,7 +25,40 @@ public class Timeline implements Serializable, Comparable<Timeline> {
       this.slaveIndex = slaveIndex;
    }
 
-   public synchronized void addEvent(String category, Event e) {
+   public static class Category {
+      private final String name;
+      private final CategoryType type;
+
+      public enum CategoryType {
+         /* All events related to system resources (CPU, memory, network, etc.) */
+         SYSMONITOR,
+         /* Any other type of events, e.g. recording values in background stages */
+         CUSTOM
+      }
+
+      public static Category sysCategory(String name) {
+         return new Category(name, CategoryType.SYSMONITOR);
+      }
+
+      public static Category customCategory(String name) {
+         return new Category(name, CategoryType.CUSTOM);
+      }
+
+      private Category(String name, CategoryType type) {
+         this.name = name;
+         this.type = type;
+      }
+
+      public String getName() {
+         return name;
+      }
+
+      public CategoryType getType() {
+         return type;
+      }
+   }
+
+   public synchronized void addEvent(Category category, Event e) {
       List<Event> cat = events.get(category);
       if (cat == null) {
          cat = new ArrayList<Event>();
@@ -40,7 +73,7 @@ public class Timeline implements Serializable, Comparable<Timeline> {
       lastTimestamp = Math.max(lastTimestamp, e.getEnded());
    }
 
-   public synchronized Set<String> getEventCategories() {
+   public synchronized Set<Category> getEventCategories() {
       return events.keySet();
    }
 
@@ -59,13 +92,6 @@ public class Timeline implements Serializable, Comparable<Timeline> {
    @Override
    public int compareTo(Timeline o) {
       return Integer.compare(slaveIndex, o.slaveIndex);
-   }
-
-   public enum EventType {
-      /* All events related to system resources (CPU, memory, network, etc.) */
-      SYSMONITOR,
-      /* Any other type of events, e.g. recording values in background stages */
-      CUSTOM
    }
 
    /**

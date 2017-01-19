@@ -32,7 +32,7 @@ public class InternalsMonitor implements Monitor {
    public void run() {
       long now = TimeService.currentTimeMillis();
       for (Map.Entry<String, Number> entry : internalsExposition.getValues().entrySet()) {
-         timeline.addEvent(entry.getKey(), new Timeline.ValueEvent(now, entry.getValue()));
+         timeline.addEvent(Timeline.Category.customCategory(entry.getKey()), new Timeline.ValueEvent(now, entry.getValue()));
       }
    }
 

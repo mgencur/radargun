@@ -240,7 +240,7 @@ public class Master {
          log.error("Caught exception", e);
          return StageResult.FAIL;
       } finally {
-         state.getTimeline().addEvent(Stage.STAGE, new Timeline.IntervalEvent(start, stage.getName(), end - start));
+         state.getTimeline().addEvent(Timeline.Category.customCategory(Stage.STAGE), new Timeline.IntervalEvent(start, stage.getName(), end - start));
       }
    }
 
