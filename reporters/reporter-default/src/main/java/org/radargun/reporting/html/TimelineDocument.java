@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import org.radargun.config.Cluster;
 import org.radargun.config.Property;
@@ -30,17 +31,18 @@ public class TimelineDocument extends HtmlDocument {
    private final String title;
    private final Cluster cluster;
    private List<Timeline> timelines;
-   private Map<String, Double> minValues = new HashMap<String, Double>();
-   private Map<String, Double> maxValues = new HashMap<String, Double>();
-   private Map<String, Integer> valueCategories = new TreeMap<String, Integer>();
-   private Map<String, Integer> eventCategories = new TreeMap<String, Integer>();
+   private Map<Timeline.Category, Double> minValues = new HashMap<>();
+   private Map<Timeline.Category, Double> maxValues = new HashMap<>();
+   private Map<Timeline.Category, Integer> valueCategories = new TreeMap<>();
+   private Map<Timeline.Category, Integer> eventCategories = new TreeMap<>();
    private long startTimestamp = Long.MAX_VALUE, endTimestamp = Long.MIN_VALUE;
 
-   public TimelineDocument(Configuration configuration, String directory, String configName, String title, List<Timeline> timelines, Cluster cluster) {
-      super(directory, "timeline_" + configName + ".html", title + " Timeline");
+   public TimelineDocument(Configuration configuration, String directory, String configName, String title, List<Timeline> timelines, Timeline.Category.CategoryType categoryType, Cluster cluster) {
+      super(directory, categoryType.name() + "_timeline_" + configName + ".html", title + " Timeline");
+      System.out.println("Category name: " + categoryType.name());
       this.title = title;
       this.configuration = configuration;
-      this.timelines = new ArrayList<Timeline>(timelines);
+      this.timelines = new ArrayList<>(timelines);
       Collections.sort(this.timelines);
       this.configName = configName;
       this.cluster = cluster;
@@ -48,13 +50,13 @@ public class TimelineDocument extends HtmlDocument {
       for (Timeline timeline : this.timelines) {
          startTimestamp = Math.min(startTimestamp, timeline.getFirstTimestamp());
          endTimestamp = Math.max(endTimestamp, timeline.getLastTimestamp());
-         for (String category : timeline.getEventCategories()) {
+         for (Timeline.Category category : timeline.getEventCategories()) {
             if (!eventCategories.containsKey(category)) {
                eventCategories.put(category, eventCategories.size());
             }
          }
 
-         for (String category : timeline.getEventCategories()) {
+         for (Timeline.Category category : timeline.getEventCategories()) {
             if (!valueCategories.containsKey(category)) {
                valueCategories.put(category, valueCategories.size());
             }
@@ -69,8 +71,8 @@ public class TimelineDocument extends HtmlDocument {
                }
             }
             if (min <= max) {
-               Double prevMin = minValues.get(category);
-               Double prevMax = maxValues.get(category);
+               Double prevMin = minValues.get(category.getName());
+               Double prevMax = maxValues.get(category.getName());
                minValues.put(category, prevMin == null ? min : Math.min(prevMin, min));
                maxValues.put(category, prevMax == null ? max : Math.max(prevMax, max));
             }
@@ -78,7 +80,7 @@ public class TimelineDocument extends HtmlDocument {
       }
       // in order to show event categories, we need at least one value category
       if (valueCategories.isEmpty()) {
-         String defaultCategory = "&nbsp;";
+         Timeline.Category defaultCategory = Timeline.Category.sysCategory("&nbsp;");
          valueCategories.put(defaultCategory, 0);
          minValues.put(defaultCategory, 0d);
          maxValues.put(defaultCategory, 0d);
@@ -90,7 +92,7 @@ public class TimelineDocument extends HtmlDocument {
       return title;
    }
 
-   public String range(final String valueCategory, final int valueCategoryId) {
+   public String range(Timeline.Category valueCategory, final int valueCategoryId) {
       Double min = minValues.get(valueCategory);
       if (min == null || min > 0) min = 0d;
       Double max = maxValues.get(valueCategory);
@@ -112,8 +114,8 @@ public class TimelineDocument extends HtmlDocument {
       final String relativeDomainFile = "domain_" + configName + "_relative.png";
       final String absoluteDomainFile = "domain_" + configName + "_absolute.png";
       ArrayList<Future> chartTaskFutures = new ArrayList<>();
-      for (Map.Entry<String, Integer> valueEntry : valueCategories.entrySet()) {
-         final String valueCategory = valueEntry.getKey();
+      for (Map.Entry<Timeline.Category, Integer> valueEntry : valueCategories.entrySet()) {
+         final Timeline.Category valueCategory = valueEntry.getKey();
          final int valueCategoryId = valueEntry.getValue();
 
          /* Range */
@@ -130,7 +132,7 @@ public class TimelineDocument extends HtmlDocument {
             chartTaskFutures.add(HtmlReporter.executor.submit(new Callable<Void>() {
                @Override
                public Void call() throws Exception {
-                  log.debug("Generating chart for " + valueCategory);
+                  log.info("Generating chart for " + valueCategory);
                   TimelineChart chart = new TimelineChart();
                   chart.setDimensions(configuration.width, configuration.height);
 
@@ -154,9 +156,8 @@ public class TimelineDocument extends HtmlDocument {
 
       for (Timeline timeline : timelines) {
          final int slaveIndex = timeline.slaveIndex;
-         for (String ec : timeline.getEventCategories()) {
-            final String eventCategory = ec;
-            final List<Timeline.Event> events = timeline.getEvents(eventCategory);
+         for (final Timeline.Category ec : timeline.getEventCategories()) {
+            final List<Timeline.Event> events = timeline.getEvents(ec);
             if (events == null) continue;
 
             chartTaskFutures.add(HtmlReporter.executor.submit(new Callable<Void>() {
@@ -166,7 +167,7 @@ public class TimelineDocument extends HtmlDocument {
                   chart.setDimensions(configuration.width, configuration.height);
                   chart.setEvents(events, slaveIndex, startTimestamp, endTimestamp, 0, 0);
 
-                  String chartFile = String.format("timeline_%s_e%d_%d.png", configName, eventCategories.get(eventCategory), slaveIndex);
+                  String chartFile = String.format("timeline_%s_e%d_%d.png", configName, eventCategories.get(ec), slaveIndex);
                   chart.saveChart(directory + File.separator + chartFile);
                   return null;
                }
@@ -205,20 +206,31 @@ public class TimelineDocument extends HtmlDocument {
       return timelines;
    }
 
-   public Map<String, Double> getMinValues() {
+   public Map<Timeline.Category, Double> getMinValues() {
       return minValues;
    }
 
-   public Map<String, Double> getMaxValues() {
+   public Map<Timeline.Category, Double> getMaxValues() {
       return maxValues;
    }
 
-   public Map<String, Integer> getValueCategories() {
+   public Map<Timeline.Category, Integer> getValueCategories() {
       return valueCategories;
    }
 
-   public Map<String, Integer> getEventCategories() {
+   public Map<Timeline.Category, Integer> getValueCategoriesOfType(String categoryType) {
+      Map<Timeline.Category, Integer> values = valueCategories.entrySet().stream().filter(e -> e.getKey().getType().toString().equals(categoryType)).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+      System.out.println("Value categories: " + values);
+      return valueCategories.entrySet().stream().filter(e -> e.getKey().getType().toString().equals(categoryType)).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+   }
+
+   public Map<Timeline.Category, Integer> getEventCategories() {
       return eventCategories;
+   }
+   public Map<Timeline.Category, Integer> getEventCategoriesOfType(String categoryType) {
+      Map<Timeline.Category, Integer> values = eventCategories.entrySet().stream().filter(e -> e.getKey().getType().toString().equals(categoryType)).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+      System.out.println("Event categories: " + values);
+      return eventCategories.entrySet().stream().filter(e -> e.getKey().getType().toString().equals(categoryType)).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
    }
 
    public long getStartTimestamp() {

@@ -258,13 +258,13 @@ public class CsvReporter implements Reporter {
    }
 
    private void reportTimelines(Report report) {
-      Set<String> allCategories = new HashSet<String>();
+      Set<Timeline.Category> allCategories = new HashSet<>();
       int maxSlaveIndex = 0;
       for (Timeline t : report.getTimelines()) {
          allCategories.addAll(t.getEventCategories());
          maxSlaveIndex = Math.max(maxSlaveIndex, t.slaveIndex);
       }
-      for (String valueCategory : allCategories) {
+      for (Timeline.Category valueCategory : allCategories) {
          FileWriter writer = null;
          try {
             writer = prepareOutputFile(report, "timeline", "_" + valueCategory);

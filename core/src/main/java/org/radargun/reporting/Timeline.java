@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.radargun.utils.TimeService;
@@ -25,7 +26,7 @@ public class Timeline implements Serializable, Comparable<Timeline> {
       this.slaveIndex = slaveIndex;
    }
 
-   public static class Category {
+   public static class Category implements Serializable, Comparable<Category> {
       private final String name;
       private final CategoryType type;
 
@@ -36,6 +37,18 @@ public class Timeline implements Serializable, Comparable<Timeline> {
          CUSTOM
       }
 
+      private Category(String name, CategoryType type) {
+         Objects.nonNull(name);
+         Objects.nonNull(type);
+         this.name = name;
+         this.type = type;
+      }
+
+      @Override
+      public int compareTo(Category other) {
+         return this.getName().compareTo(other.getName());
+      }
+
       public static Category sysCategory(String name) {
          return new Category(name, CategoryType.SYSMONITOR);
       }
@@ -44,17 +57,31 @@ public class Timeline implements Serializable, Comparable<Timeline> {
          return new Category(name, CategoryType.CUSTOM);
       }
 
-      private Category(String name, CategoryType type) {
-         this.name = name;
-         this.type = type;
-      }
-
       public String getName() {
          return name;
       }
 
       public CategoryType getType() {
          return type;
+      }
+
+      @Override
+      public boolean equals(Object o) {
+         if (this == o) return true;
+         if (o == null || getClass() != o.getClass()) return false;
+
+         Category category = (Category) o;
+
+         if (!name.equals(category.name)) return false;
+         return type == category.type;
+
+      }
+
+      @Override
+      public int hashCode() {
+         int result = name.hashCode();
+         result = 31 * result + type.hashCode();
+         return result;
       }
    }
 
@@ -77,7 +104,7 @@ public class Timeline implements Serializable, Comparable<Timeline> {
       return events.keySet();
    }
 
-   public synchronized List<Event> getEvents(String category) {
+   public synchronized List<Event> getEvents(Category category) {
       return events.get(category);
    }
 

@@ -8,9 +8,9 @@
 <body>
    <h1> ${timelineDocument.title} Timeline</h1>
    <table class="graphTable floatLeft">
-      <#list timelineDocument.getValueCategories()?keys as key>
+      <#list timelineDocument.getValueCategoriesOfType(categoryType)?keys as key>
          <#assign valueCategory = key />
-         <#assign valueCategoryId = timelineDocument.getValueCategories()[key] />
+         <#assign valueCategoryId = timelineDocument.getValueCategoriesOfType(categoryType)?api.get(key) />
 
          <#assign relativeDomainFile = "domain_${timelineDocument.getConfigName()}_relative.png" />
          <#assign absoluteDomainFile = "domain_${timelineDocument.getConfigName()}_absolute.png" />
@@ -31,13 +31,16 @@
                      <img class="topLeft" id="layer_${valueCategoryId}_${timeline.slaveIndex}" src="${valueChartFile}">
 
                      <#list timeline.getEventCategories() as eventCategory>
+                        <#-- <#assign categoryName = eventCategory.getName() /> -->
                         <#assign events = timeline.getEvents(eventCategory)!false />
                         <#if !events?is_boolean>
-                           <#assign eventCategoryId = timelineDocument.getEventCategories()[eventCategory] />
-                           <#assign eventChartFile = timelineDocument.generateEventChartFile(eventCategoryId, timeline.slaveIndex) />
-                           <img class="topLeft"
-                                id="layer_${valueCategoryId}_${timelineDocument.eventCategories[eventCategory]}_${timeline.slaveIndex}"
-                                src="${eventChartFile}">
+                           <#assign eventCategoryId = timelineDocument.getEventCategoriesOfType(categoryType)?api.get(category)!false />
+                           <#if !eventCategoryId?is_boolean>
+                              <#assign eventChartFile = timelineDocument.generateEventChartFile(eventCategoryId, timeline.slaveIndex) />
+                              <img class="topLeft"
+                                   id="layer_${valueCategoryId}_${timelineDocument.eventCategories?api.get(category)}_${timeline.slaveIndex}"
+                                   src="${eventChartFile}">
+                           </#if>
                         </#if>
                      </#list>
                   </#list>
@@ -61,12 +64,14 @@
 
    <#-- Checkboxes -->
    <div class="floatLeft">
-      <#list timelineDocument.getEventCategories()?keys as key>
-         <#assign value = timelineDocument.getEventCategories()[key] />
-          <input id="cat_${value}" type="checkbox" checked="checked"
-                 onclick="${resetDisplay(value)}">
-          <strong>${key}</strong>
-          <br/>
+      <#list timelineDocument.getEventCategoriesOfType(categoryType)?keys as key>
+         <#assign value = timelineDocument.getEventCategoriesOfType(categoryType)?api.get(category)!false />
+         <#if !value?is_boolean>
+             <input id="cat_${value}" type="checkbox" checked="checked"
+                    onclick="${resetDisplay(value)}">
+             <strong>${key}</strong>
+             <br/>
+         </#if>
       </#list>
       <br/><br/>
       <#assign groups = timelineDocument.getCluster().getGroups() />

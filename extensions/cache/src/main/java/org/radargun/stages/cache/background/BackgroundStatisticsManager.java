@@ -135,7 +135,7 @@ public final class BackgroundStatisticsManager extends ServiceListenerAdapter {
             Statistics aggregated = stats.stream().reduce(Statistics.MERGE).orElseThrow(() -> new IllegalStateException("No statistics!"));
             for (String operation : aggregated.getOperations()) {
                OperationThroughput throughput = aggregated.getRepresentation(operation, OperationThroughput.class);
-               if (throughput != null && (throughput.gross != 0 || timeline.getEvents(operation + " Throughput") != null)) {
+               if (throughput != null && (throughput.gross != 0 || timeline.getEvents(Timeline.Category.customCategory(operation + " Throughput")) != null)) {
                   timeline.addEvent(Timeline.Category.customCategory(operation + " Throughput"), new Timeline.ValueEvent(now, throughput.gross));
                }
             }

@@ -16,11 +16,19 @@
          </li>
       </#list>
    </ul>
-   <h2>Timelines</h2>
+   <h2>Resource utilization</h2>
       <ul>
          <#list reporter.reports as report>
             <li>
-               <a href="timeline_${report.configuration.name}_${report.cluster.clusterIndex}.html">${report.configuration.name} on ${report.cluster}</a>
+               <a href="SYSMONITOR_timeline_${report.configuration.name}_${report.cluster.clusterIndex}.html">${report.configuration.name} on ${report.cluster}</a>
+            </li>
+         </#list>
+      </ul>
+   <h2>Other timeline charts</h2>
+      <ul>
+         <#list reporter.reports as report>
+            <li>
+               <a href="CUSTOM_timeline_${report.configuration.name}_${report.cluster.clusterIndex}.html">${report.configuration.name} on ${report.cluster}</a>
             </li>
          </#list>
       </ul>

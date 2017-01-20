@@ -49,7 +49,7 @@ public class TimelineChartsTest {
 
       Cluster cluster = new Cluster();
       cluster.addGroup("default", 2);
-      TimelineDocument timelineDocument = new TimelineDocument(new TimelineDocument.Configuration(), "test", "testconfig", "Test Config", Arrays.asList(t0, t1), cluster);
+      TimelineDocument timelineDocument = new TimelineDocument(new TimelineDocument.Configuration(), "test", "testconfig", "Test Config", Arrays.asList(t0, t1), Timeline.Category.CategoryType.SYSMONITOR, cluster);
 
       timelineDocument.createReportDirectory();
       timelineDocument.createTestCharts();
