@@ -241,7 +241,7 @@ public class TimelineDocument extends HtmlDocument {
       return endTimestamp;
    }
 
-   public String generateEventChartFile(int eventCategoryId, int slaveIndex) {
+   public String generateEventChartFileName(int eventCategoryId, int slaveIndex) {
       return String.format("timeline_%s_e%d_%d.png", configName, eventCategoryId, slaveIndex);
    }
 

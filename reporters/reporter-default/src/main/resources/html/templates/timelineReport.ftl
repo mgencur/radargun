@@ -16,7 +16,7 @@
          <#assign absoluteDomainFile = "domain_${timelineDocument.getConfigName()}_absolute.png" />
 
          <tr>
-            <th colspan="2"> ${valueCategory} </th>
+            <th colspan="2"> ${valueCategory.getName()} </th>
          </tr>
          <#assign rangeFile = timelineDocument.range(valueCategory, valueCategoryId) />
          <tr>
@@ -31,15 +31,21 @@
                      <img class="topLeft" id="layer_${valueCategoryId}_${timeline.slaveIndex}" src="${valueChartFile}">
 
                      <#list timeline.getEventCategories() as eventCategory>
-                        <#-- <#assign categoryName = eventCategory.getName() /> -->
                         <#assign events = timeline.getEvents(eventCategory)!false />
                         <#if !events?is_boolean>
-                           <#assign eventCategoryId = timelineDocument.getEventCategoriesOfType(categoryType)?api.get(category)!false />
+                           <#assign eventCategoryId = timelineDocument.getEventCategoriesOfType(categoryType)?api.get(eventCategory)!false />
                            <#if !eventCategoryId?is_boolean>
-                              <#assign eventChartFile = timelineDocument.generateEventChartFile(eventCategoryId, timeline.slaveIndex) />
+                              <#assign eventChartFileName = timelineDocument.generateEventChartFileName(eventCategoryId, timeline.slaveIndex) />
                               <img class="topLeft"
-                                   id="layer_${valueCategoryId}_${timelineDocument.eventCategories?api.get(category)}_${timeline.slaveIndex}"
-                                   src="${eventChartFile}">
+                                   id="layer_${valueCategoryId}_${timelineDocument.eventCategories?api.get(eventCategory)}_${timeline.slaveIndex}"
+                                   src="${eventChartFileName}">
+                           </#if>
+                           <#assign eventCategoryId = timelineDocument.getEventCategoriesOfType("TIMELINE_EVENTS")?api.get(eventCategory)!false />
+                           <#if !eventCategoryId?is_boolean>
+                           <#assign eventChartFileName = timelineDocument.generateEventChartFileName(eventCategoryId, timeline.slaveIndex) />
+                           <img class="topLeft"
+                                id="layer_${valueCategoryId}_${timelineDocument.eventCategories?api.get(eventCategory)}_${timeline.slaveIndex}"
+                                src="${eventChartFileName}">
                            </#if>
                         </#if>
                      </#list>
@@ -64,12 +70,12 @@
 
    <#-- Checkboxes -->
    <div class="floatLeft">
-      <#list timelineDocument.getEventCategoriesOfType(categoryType)?keys as key>
-         <#assign value = timelineDocument.getEventCategoriesOfType(categoryType)?api.get(category)!false />
+      <#list timelineDocument.getEventCategoriesOfType("TIMELINE_EVENTS")?keys as key>
+         <#assign value = timelineDocument.getEventCategoriesOfType("TIMELINE_EVENTS")?api.get(key)!false />
          <#if !value?is_boolean>
              <input id="cat_${value}" type="checkbox" checked="checked"
                     onclick="${resetDisplay(value)}">
-             <strong>${key}</strong>
+             <strong>${key.getName()}</strong>
              <br/>
          </#if>
       </#list>

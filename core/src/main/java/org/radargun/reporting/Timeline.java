@@ -31,6 +31,8 @@ public class Timeline implements Serializable, Comparable<Timeline> {
       private final CategoryType type;
 
       public enum CategoryType {
+         /* Events that are shown as a guidance in other charts (stage events, lifecycle events, etc.) */
+         TIMELINE_EVENTS,
          /* All events related to system resources (CPU, memory, network, etc.) */
          SYSMONITOR,
          /* Any other type of events, e.g. recording values in background stages */
@@ -47,6 +49,10 @@ public class Timeline implements Serializable, Comparable<Timeline> {
       @Override
       public int compareTo(Category other) {
          return this.getName().compareTo(other.getName());
+      }
+
+      public static Category timelineCategory(String name) {
+         return new Category(name, CategoryType.TIMELINE_EVENTS);
       }
 
       public static Category sysCategory(String name) {
@@ -102,6 +108,10 @@ public class Timeline implements Serializable, Comparable<Timeline> {
 
    public synchronized Set<Category> getEventCategories() {
       return events.keySet();
+   }
+
+   public synchronized boolean containsEventsOfType(Category.CategoryType type) {
+      return events.keySet().stream().anyMatch(e -> e.getType().equals(type));
    }
 
    public synchronized List<Event> getEvents(Category category) {

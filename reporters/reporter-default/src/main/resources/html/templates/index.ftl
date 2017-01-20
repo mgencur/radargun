@@ -24,6 +24,8 @@
             </li>
          </#list>
       </ul>
+   <#assign printCustomEvents = reporter.hasReportsWithEventsOfType(categoryType) />
+   <#if printCustomEvents>
    <h2>Other timeline charts</h2>
       <ul>
          <#list reporter.reports as report>
@@ -32,6 +34,7 @@
             </li>
          </#list>
       </ul>
+   </#if>
    <h2>Configurations</h2>
       The benchmark was executed on following configurations and cluster sizes: <br/>
    <ul>

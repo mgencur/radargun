@@ -221,6 +221,7 @@ public class HtmlReporter implements Reporter {
       Map root = new HashMap();
       root.put("reporter", this);
       root.put("indexDocument", index);
+      root.put("categoryType", Timeline.Category.CategoryType.CUSTOM);
 
       processTemplate(root, targetDir, "index.html", "index.ftl");
    }
@@ -313,5 +314,9 @@ public class HtmlReporter implements Reporter {
 
    public Collection<Report> getReports() {
       return reports;
+   }
+
+   public boolean hasReportsWithEventsOfType(Timeline.Category.CategoryType type) {
+      return reports.stream().anyMatch(r -> r.hasTimelineWithEventsOfType(type));
    }
 }

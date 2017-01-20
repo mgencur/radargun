@@ -58,7 +58,7 @@ public class LifecycleHelper {
          long startingTime = TimeService.currentTimeMillis();
          lifecycle.start();
          long startedTime = TimeService.currentTimeMillis();
-         slaveState.getTimeline().addEvent(Timeline.Category.customCategory(LifecycleHelper.LIFECYCLE), new Timeline.IntervalEvent(startingTime, "Start", startedTime - startingTime));
+         slaveState.getTimeline().addEvent(Timeline.Category.timelineCategory(LifecycleHelper.LIFECYCLE), new Timeline.IntervalEvent(startingTime, "Start", startedTime - startingTime));
          if (validate && clustered != null) {
 
             int expectedNumberOfSlaves = expectedSlaves != null ? expectedSlaves : slaveState.getGroupSize();
@@ -172,7 +172,7 @@ public class LifecycleHelper {
                }
             }
             long stoppedTime = TimeService.currentTimeMillis();
-            slaveState.getTimeline().addEvent(Timeline.Category.customCategory(LIFECYCLE), new Timeline.IntervalEvent(stoppingTime, "Stop", stoppedTime - stoppingTime));
+            slaveState.getTimeline().addEvent(Timeline.Category.timelineCategory(LIFECYCLE), new Timeline.IntervalEvent(stoppingTime, "Stop", stoppedTime - stoppingTime));
          } finally {
             for (ServiceListener listener : slaveState.getServiceListeners()) {
                listener.afterServiceStop(graceful);
