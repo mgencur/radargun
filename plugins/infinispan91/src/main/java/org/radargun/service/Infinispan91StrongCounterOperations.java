@@ -8,11 +8,11 @@ import org.radargun.traits.StrongCounterOperations;
 /**
  * @author Martin Gencur
  */
-public class Infinispan90StrongCounterOperations implements StrongCounterOperations {
+public class Infinispan91StrongCounterOperations implements StrongCounterOperations {
 
    protected final InfinispanEmbeddedService service;
 
-   public Infinispan90StrongCounterOperations(InfinispanEmbeddedService service) {
+   public Infinispan91StrongCounterOperations(InfinispanEmbeddedService service) {
       this.service = service;
    }
 

@@ -36,11 +36,6 @@ public class Infinispan90EmbeddedService extends Infinispan82EmbeddedService {
       return new Infinispan90EmbeddedQueryable(this);
    }
 
-   @ProvidesTrait
-   public StrongCounterOperations createStrongCounterOperations() {
-      return new Infinispan90StrongCounterOperations(this);
-   }
-
    @Override
    protected void startJGroupsDumper(Runnable thread) {
       JGroupsTransport transport = (JGroupsTransport) cacheManager.getTransport();

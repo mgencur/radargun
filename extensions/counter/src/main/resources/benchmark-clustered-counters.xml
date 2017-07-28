@@ -8,13 +8,13 @@
    </clusters>
 
    <configurations>
-      <config name="Infinispan 9.0 - Strong Clustered Counter">
-         <setup plugin="infinispan90">
+      <config name="Infinispan 9.1 - Strong Clustered Counter">
+         <setup plugin="infinispan91">
             <!-- You can set JVM arguments for slaves here. -->
             <vm-args>
                <memory max="4G" />
             </vm-args>
-            <embedded xmlns="urn:radargun:plugins:infinispan90:3.0" file="clustered-counters.xml"/>
+            <embedded xmlns="urn:radargun:plugins:infinispan91:3.0" file="clustered-counters.xml"/>
          </setup>
       </config>
      
