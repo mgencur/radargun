@@ -28,7 +28,6 @@
 
       <jvm-monitor-start />
 
-      <!-- other options for operation name: DECREMENT_AND_GET, ADD_AND_GET, COMPARE_AND_SET -->
       <counter:strong-counter-test test-name="INCREMENT_AND_GET_TEST"
                               duration="3s"
                               num-threads-per-node="1"

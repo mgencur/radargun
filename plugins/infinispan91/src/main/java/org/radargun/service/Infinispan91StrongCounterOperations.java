@@ -44,10 +44,5 @@ public class Infinispan91StrongCounterOperations implements StrongCounterOperati
       public CompletableFuture<Long> addAndGet(long delta) {
          return counter.addAndGet(delta);
       }
-
-      @Override
-      public CompletableFuture<Boolean> compareAndSet(long expect, long update) {
-         return counter.compareAndSet(expect, update);
-      }
    }
 }

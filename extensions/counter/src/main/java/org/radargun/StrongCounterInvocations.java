@@ -96,36 +96,4 @@ public class StrongCounterInvocations {
          return StrongCounterOperations.ADD_AND_GET;
       }
    }
-
-   public static final class CompareAndSet implements Invocation<Boolean> {
-      private final StrongCounterOperations.StrongCounter strongCounter;
-      private final long expect;
-      private final long update;
-
-      public CompareAndSet(StrongCounterOperations.StrongCounter strongCounter, long expect, long update) {
-         this.strongCounter = strongCounter;
-         this.expect = expect;
-         this.update = update;
-      }
-
-      @Override
-      public Boolean invoke() {
-         try {
-            return strongCounter.compareAndSet(expect, update).get();
-         } catch (Exception e) {
-            throw new RuntimeException("Operation " +
-               StrongCounterOperations.COMPARE_AND_SET.toString() + "failed", e);
-         }
-      }
-
-      @Override
-      public Operation operation() {
-         return StrongCounterOperations.COMPARE_AND_SET;
-      }
-
-      @Override
-      public Operation txOperation() {
-         return StrongCounterOperations.COMPARE_AND_SET;
-      }
-   }
 }

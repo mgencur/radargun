@@ -13,7 +13,6 @@ public interface StrongCounterOperations {
    Operation INCREMENT_AND_GET = Operation.register(TRAIT + ".INCREMENT_AND_GET");
    Operation DECREMENT_AND_GET = Operation.register(TRAIT + ".DECREMENT_AND_GET");
    Operation ADD_AND_GET = Operation.register(TRAIT + ".ADD_AND_GET");
-   Operation COMPARE_AND_SET = Operation.register(TRAIT + ".COMPARE_AND_SET");
 
    StrongCounter getStrongCounter(String name);
 
@@ -42,14 +41,5 @@ public interface StrongCounterOperations {
        * @return The new value.
        */
       CompletableFuture<Long> addAndGet(long delta);
-
-      /**
-       * Atomically sets the value to the given updated value if the current value {@code ==} the expected value.
-       *
-       * @param expect the expected value
-       * @param update the new value
-       * @return {@code true} if successful, {@code false} otherwise.
-       */
-      CompletableFuture<Boolean> compareAndSet(long expect, long update);
    }
 }

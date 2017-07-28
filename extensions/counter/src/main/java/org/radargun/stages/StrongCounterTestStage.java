@@ -38,7 +38,7 @@ public class StrongCounterTestStage extends TestStage {
    protected int delta = 1;
 
    enum OperationName {
-      INCREMENT_AND_GET, DECREMENT_AND_GET, ADD_AND_GET, COMPARE_AND_SET
+      INCREMENT_AND_GET, DECREMENT_AND_GET, ADD_AND_GET
    }
 
    @InjectTrait
@@ -56,12 +56,9 @@ public class StrongCounterTestStage extends TestStage {
    }
 
    /**
-    * Stressor logic for strong counter operations. All operations except COMPARE_AND_SET
+    * Stressor logic for strong counter operations. All operations
     * are supposed to use a shared counter between threads (this tests both consistency and
-    * performance). The COMPARE_AND_SET logic is supposed to
-    * use a different counter for each thread otherwise the first thread that updates the value
-    * prevents all the other threads from ever updating (succeeding) the value because the "compare" operation will
-    * always fail for them (this tests only performance, not consistency as the counters are not shared).
+    * performance).
     */
    protected class StrongCounterLogic extends OperationLogic {
       private StrongCounterOperations.StrongCounter counter;
@@ -93,15 +90,9 @@ public class StrongCounterTestStage extends TestStage {
             Invocation<Long> invocation = new StrongCounterInvocations.AddAndGet(counter, delta);
             currentValue = stressor.makeRequest(invocation);
             assertNotEqual(previousValue, currentValue);
-         } else if (operation == StrongCounterOperations.COMPARE_AND_SET) {
-            currentValue = previousValue + 1;
-            Invocation<Boolean> invocation = new StrongCounterInvocations.CompareAndSet(counter, previousValue, currentValue);
-            boolean success = stressor.makeRequest(invocation);
-            if (!success) {
-               throw new IllegalStateException("Inconsistent counter! The value should be " + previousValue);
-            }
-         } else throw new IllegalArgumentException(operation.name);
-
+         } else {
+            throw new IllegalArgumentException(operation.name);
+         }
          previousValue = currentValue; // exception was NOT thrown so we can update previous value for all operations
       }
 
