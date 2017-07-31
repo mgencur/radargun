@@ -1,8 +1,16 @@
 package org.radargun.stages;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+import org.radargun.DistStageAck;
 import org.radargun.Operation;
+import org.radargun.StageResult;
 import org.radargun.StrongCounterInvocations;
 import org.radargun.Version;
+import org.radargun.config.Init;
 import org.radargun.config.Namespace;
 import org.radargun.config.Property;
 import org.radargun.config.Stage;
@@ -12,6 +20,8 @@ import org.radargun.stages.test.OperationSelector;
 import org.radargun.stages.test.RatioOperationSelector;
 import org.radargun.stages.test.Stressor;
 import org.radargun.stages.test.TestStage;
+import org.radargun.state.SlaveState;
+import org.radargun.stats.Statistics;
 import org.radargun.traits.InjectTrait;
 import org.radargun.traits.StrongCounterOperations;
 
@@ -37,12 +47,30 @@ public class StrongCounterTestStage extends TestStage {
    @Property(doc = "Delta to add for addAndGet operation. Default is 1.")
    protected int delta = 1;
 
+   private Comparator<Long> comparator;
+
    enum OperationName {
       INCREMENT_AND_GET, DECREMENT_AND_GET, ADD_AND_GET
    }
 
    @InjectTrait
    protected StrongCounterOperations counterOperations;
+
+   @Init
+   @Override
+   public void init() {
+      super.init();
+      if (OperationName.INCREMENT_AND_GET.equals(operationName)) {
+         delta = 1;
+      } else if (OperationName.DECREMENT_AND_GET.equals(operationName)) {
+         delta = -1;
+      }
+      if (delta < 0) {
+         comparator = Comparator.reverseOrder();
+      } else {
+         comparator = Comparator.naturalOrder();
+      }
+   }
 
    @Override
    protected OperationSelector createOperationSelector() {
@@ -55,6 +83,57 @@ public class StrongCounterTestStage extends TestStage {
       return new StrongCounterLogic();
    }
 
+   @Override
+   protected DistStageAck newStatisticsAck(List<Stressor> stressors) {
+      List<Long> data = new ArrayList<>();
+      data.addAll(stressors.stream()
+         .map(stressor -> ((StrongCounterLogic) stressor.getLogic()).valueSequence)
+         .flatMap(values -> values.stream()) //merge values from all stressors into single list
+         .collect(Collectors.toList()));
+      return new ClusteredCounterAck(slaveState, gatherResults(stressors, new StatisticsResultRetriever()), data);
+   }
+
+   @Override
+   public StageResult processAckOnMaster(List<DistStageAck> acks) {
+      StageResult result = super.processAckOnMaster(acks);
+      if (result.isError()) return result;
+
+      List<ClusteredCounterAck> counterAcks = instancesOf(acks, ClusteredCounterAck.class);
+
+      TreeSet<Long> allValues = getSortedValues(counterAcks);
+      assertNoSkipped(allValues);
+
+      return result;
+   }
+
+   private TreeSet<Long> getSortedValues(List<ClusteredCounterAck> counterAcks) {
+      TreeSet<Long> allValues = new TreeSet<>(comparator);
+      counterAcks.stream()
+         .map(ack -> ack.values)
+         .flatMap(values -> values.stream())
+         .forEach(v -> {
+            if (allValues.contains(v)) {
+               throw new IllegalStateException("Inconsistent counter! The value " + v + " already returned by different thread!");
+            } else {
+               allValues.add(v);
+            }
+         });
+      return allValues;
+   }
+
+   private void assertNoSkipped(TreeSet<Long> values) {
+      long first = values.first();
+      long previous = first;
+      for (Long v : values.tailSet(first, false)) {
+         long expected = previous + delta;
+         if (v != expected) {
+            throw new IllegalStateException("The value " + expected + " skipped by the counter! Current value: " + v);
+         } else {
+            previous = v;
+         }
+      }
+   }
+
    /**
     * Stressor logic for strong counter operations. All operations
     * are supposed to use a shared counter between threads (this tests both consistency and
@@ -63,9 +142,11 @@ public class StrongCounterTestStage extends TestStage {
    protected class StrongCounterLogic extends OperationLogic {
       private StrongCounterOperations.StrongCounter counter;
       private long previousValue;
+      private List<Long> valueSequence;
 
       public StrongCounterLogic() {
          this.previousValue = initialValue;
+         this.valueSequence = new ArrayList<>();
       }
 
       @Override
@@ -94,12 +175,21 @@ public class StrongCounterTestStage extends TestStage {
             throw new IllegalArgumentException(operation.name);
          }
          previousValue = currentValue; // exception was NOT thrown so we can update previous value for all operations
+         valueSequence.add(currentValue); //record the value for eventual consistency check
       }
 
       private void assertNotEqual(long previous, long current) {
          if (previous == current) {
             throw new IllegalStateException("Inconsistent counter! The value should be different from " + previous);
          }
+      }
+   }
+
+   protected static class ClusteredCounterAck extends StatisticsAck {
+      List<Long> values;
+      public ClusteredCounterAck(SlaveState slaveState, List<Statistics> statistics, List<Long> values) {
+         super(slaveState, statistics, null);
+         this.values = values;
       }
    }
 }
