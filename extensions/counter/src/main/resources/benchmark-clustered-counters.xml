@@ -52,6 +52,12 @@
                                    initial-value="0">
       </counter:strong-counter-test>
 
+      <counter:weak-counter-test test-name="ADD_TEST"
+                                   duration="3s"
+                                   num-threads-per-node="1"
+                                   counter-name="c5">
+      </counter:weak-counter-test>
+
       <jvm-monitor-stop />
       
    </rg:scenario>

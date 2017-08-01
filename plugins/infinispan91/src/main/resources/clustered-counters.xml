@@ -26,7 +26,7 @@
             <lower-bound value="0"/>
             <upper-bound value="10"/>
          </strong-counter>
-         <weak-counter name="c5" initial-value="5" storage="PERSISTENT" concurrency-level="1"/>
+         <weak-counter name="c5" initial-value="5" storage="VOLATILE" concurrency-level="1"/>
       </counters>
    </cache-container>
 
