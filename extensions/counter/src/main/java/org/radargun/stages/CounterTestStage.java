@@ -78,6 +78,11 @@ public class CounterTestStage extends TestStage {
       public void init(Stressor stressor) {
          super.init(stressor);
          this.counter = counterOperations.getCounter(counterName);
+         try {
+            this.counter.reset();
+         } catch (Exception e) {
+            throw new RuntimeException("Failed to reset the counter!");
+         }
          log.warn("Transactions ignored for Counter operations!");
          stressor.setUseTransactions(false);//transactions for counter do not make sense
       }

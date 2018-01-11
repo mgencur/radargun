@@ -28,6 +28,11 @@ public class Hazelcast39CounterOperations implements CounterOperations {
       }
 
       @Override
+      public void reset() throws Exception {
+         counter.set(0);
+      }
+
+      @Override
       public long getValue() throws Exception {
          return counter.get();
       }

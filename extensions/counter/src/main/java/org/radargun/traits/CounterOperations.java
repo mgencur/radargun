@@ -18,6 +18,8 @@ public interface CounterOperations {
    Counter getCounter(String name);
 
    interface Counter {
+      void reset() throws Exception;
+
       long getValue() throws Exception;
 
       long incrementAndGet() throws Exception;

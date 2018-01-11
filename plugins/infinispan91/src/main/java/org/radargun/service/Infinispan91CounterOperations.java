@@ -30,6 +30,11 @@ public class Infinispan91CounterOperations implements CounterOperations {
       }
 
       @Override
+      public void reset() throws Exception {
+         counter.reset().get();
+      }
+
+      @Override
       public long getValue() throws Exception {
          return counter.getValue().get();
       }
