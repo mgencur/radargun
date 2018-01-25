@@ -4,6 +4,7 @@ package org.radargun.stages;
 import org.radargun.CounterInvocations;
 import org.radargun.Operation;
 import org.radargun.Version;
+import org.radargun.WeakCounterInvocations;
 import org.radargun.config.Namespace;
 import org.radargun.config.Property;
 import org.radargun.config.Stage;
@@ -15,6 +16,7 @@ import org.radargun.stages.test.Stressor;
 import org.radargun.stages.test.TestStage;
 import org.radargun.traits.CounterOperations;
 import org.radargun.traits.InjectTrait;
+import org.radargun.traits.WeakCounterOperations;
 
 
 /**
