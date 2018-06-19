@@ -58,6 +58,11 @@ public class Infinispan60HotrodService extends InfinispanHotrodService {
    @Property(doc = "Maximal amount of active connections to all servers. Default is unlimited.")
    protected int maxConnectionsTotal = -1;
 
+   @Property(doc = "Socket timeout. Default is 60000.")
+   protected int socketTimeout = 60000;
+
+   @Property(doc = "Connection timeout. Default is 60000.")
+   protected int connectionTimeout = 60000;
 
    protected ArrayList<String> serverHostnames = new ArrayList<String>();
    protected InfinispanHotrodQueryable queryable;
@@ -70,7 +75,11 @@ public class Infinispan60HotrodService extends InfinispanHotrodService {
 
    protected ConfigurationBuilder getDefaultHotRodConfig() {
       ConfigurationBuilder builder = new ConfigurationBuilder();
-      builder.connectionPool().maxActive(maxConnectionsServer).maxTotal(maxConnectionsTotal);
+      builder.connectionPool()
+         .maxActive(maxConnectionsServer)
+         .maxTotal(maxConnectionsTotal)
+         .socketTimeout(socketTimeout)
+         .connectionTimeout(connectionTimeout);
       for (String server : servers.split(";")) {
          Matcher matcher = ADDRESS_PATTERN.matcher(server);
          if (!matcher.matches()) {
