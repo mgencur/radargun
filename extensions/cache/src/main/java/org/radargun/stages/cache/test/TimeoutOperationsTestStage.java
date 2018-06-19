@@ -70,7 +70,7 @@ public class TimeoutOperationsTestStage extends CacheOperationsTestStage {
       public void init(Stressor stressor) {
          super.init(stressor);
          String cacheName = cacheSelector.getCacheName(stressor.getGlobalThreadIndex());
-         cache = timeoutOperations.getCache(cacheName, timeout, TimeUnit.NANOSECONDS);
+         cache = timeoutOperations.getCache(cacheName);
          stressor.setUseTransactions(false);
          keySelector = getKeySelector(stressor);
       }

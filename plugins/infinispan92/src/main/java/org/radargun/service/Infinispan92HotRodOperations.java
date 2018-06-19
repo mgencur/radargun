@@ -18,7 +18,7 @@ public class Infinispan92HotRodOperations implements TimeoutOperations {
       this.service = service;
    }
 
-   public <K, V> TimeoutOperations.Cache<K, V> getCache(String cacheName, long timeout, TimeUnit timeUnit) {
+   public <K, V> TimeoutOperations.Cache<K, V> getCache(String cacheName) {
       if (cacheName == null) {
          cacheName = service.getCacheName();
       }

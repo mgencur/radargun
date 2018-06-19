@@ -12,7 +12,7 @@ public interface TimeoutOperations {
    Operation GET = Operation.register(TRAIT + ".GetWithTimeout");
    Operation PUT = Operation.register(TRAIT + ".PutWithTimeout");
 
-   <K, V> Cache<K, V> getCache(String cacheName, long timeout, TimeUnit timeUnit);
+   <K, V> Cache<K, V> getCache(String cacheName);
 
    interface Cache<K, V> {
 
