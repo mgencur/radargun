@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.radargun.Operation;
 import org.radargun.stages.test.Invocation;
@@ -13,12 +14,14 @@ import org.radargun.traits.BulkOperations;
 import org.radargun.traits.ConditionalOperations;
 import org.radargun.traits.StreamingOperations;
 import org.radargun.traits.TemporalOperations;
+import org.radargun.traits.TimeoutOperations;
 
 /**
  * Provides {@link org.radargun.stages.test.Invocation} implementations for
  * operations from traits {@link org.radargun.traits.BasicOperations},
- * {@link org.radargun.traits.ConditionalOperations}, and
- * {@link org.radargun.traits.BulkOperations}.
+ * {@link org.radargun.traits.ConditionalOperations},
+ * {@link org.radargun.traits.BulkOperations},
+ * {@link org.radargun.traits.TimeoutOperations},
  *
  * @author Radim Vansa &lt;rvansa@redhat.com&gt;
  */
@@ -43,6 +46,38 @@ public class CacheInvocations {
       @Override
       public Operation operation() {
          return value == null ? GET_NULL : BasicOperations.GET;
+      }
+
+      @Override
+      public Operation txOperation() {
+         return TX;
+      }
+   }
+
+   public static final class GetWithTimeout<K, V> implements Invocation<V> {
+      public static final Operation GET_NULL = TimeoutOperations.GET.derive("Null");
+      public static final Operation TX = TimeoutOperations.GET.derive("tx");
+      private final TimeoutOperations.Cache<K, V> cache;
+      private final K key;
+      private V value;
+      private final long timeout;
+      private final TimeUnit timeUnit;
+
+      public GetWithTimeout(TimeoutOperations.Cache cache, K key, long timeout, TimeUnit timeUnit) {
+         this.cache = cache;
+         this.key = key;
+         this.timeout = timeout;
+         this.timeUnit = timeUnit;
+      }
+
+      @Override
+      public V invoke() {
+         return value = cache.get(key, timeout, timeUnit);
+      }
+
+      @Override
+      public Operation operation() {
+         return value == null ? GET_NULL : TimeoutOperations.GET;
       }
 
       @Override
@@ -80,8 +115,38 @@ public class CacheInvocations {
       }
    }
 
+   public static final class PutWithTimeout<K, V> implements Invocation<V> {
+      private final TimeoutOperations.Cache<K, V> cache;
+      private final K key;
+      private V value;
+      private final long timeout;
+      private final TimeUnit timeUnit;
+
+      public PutWithTimeout(TimeoutOperations.Cache cache, K key, V value, long timeout, TimeUnit timeUnit) {
+         this.cache = cache;
+         this.key = key;
+         this.value = value;
+         this.timeout = timeout;
+         this.timeUnit = timeUnit;
+      }
+
+      @Override
+      public V invoke() {
+         return value = cache.put(key, value, timeout, timeUnit);
+      }
+
+      @Override
+      public Operation operation() {
+         return TimeoutOperations.PUT;
+      }
+
+      @Override
+      public Operation txOperation() {
+         return TimeoutOperations.PUT.derive("tx");
+      }
+   }
+
    public static final class PutWithLifespan<K, V> implements Invocation<V> {
-      private final Operation tx = TemporalOperations.PUT_WITH_LIFESPAN.derive("tx");
       private final TemporalOperations.Cache<K, V> cache;
       private final K key;
       private final V value;
@@ -107,7 +172,7 @@ public class CacheInvocations {
 
       @Override
       public Operation txOperation() {
-         return tx;
+         return TemporalOperations.PUT_WITH_LIFESPAN.derive("tx");
       }
    }
 
