@@ -20,6 +20,7 @@ import org.radargun.utils.TimeService;
  */
 public class LifecycleHelper {
 
+   public static final String SERVICE_INSTANCE = "SERVICE_INSTANCE";
    private static final Log log = LogFactory.getLog(LifecycleHelper.class);
    protected static final String LIFECYCLE = "Lifecycle";
 
@@ -91,6 +92,7 @@ public class LifecycleHelper {
                }
             }
          }
+         slaveState.put("SERVICE_INSTANCE", lifecycle);
          for (ServiceListener listener : slaveState.getListeners()) {
             try {
                listener.afterServiceStart();

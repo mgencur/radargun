@@ -122,6 +122,7 @@
       <extension.rest />
       <extension.counter/>
       <extension.multimap/>
+      <extension.infinispan-socket-timeout/>
    </properties>
 
    <profiles>
@@ -257,6 +258,21 @@
          </modules>
          <properties>
             <extension.multimap>multimap</extension.multimap>
+         </properties>
+      </profile>
+      <profile>
+         <id>infinispan-socket-timeout</id>
+         <activation>
+            <activeByDefault>true</activeByDefault>
+            <property>
+               <name>!no-infinispan-socket-timeout</name>
+            </property>
+         </activation>
+         <modules>
+            <module>../extensions/infinispan-socket-timeout</module>
+         </modules>
+         <properties>
+            <extension.infinispan-socket-timeout>infinispan-socket-timeout</extension.infinispan-socket-timeout>
          </properties>
       </profile>
       <!-- Reporters -->

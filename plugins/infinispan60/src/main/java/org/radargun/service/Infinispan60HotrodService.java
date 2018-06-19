@@ -130,7 +130,7 @@ public class Infinispan60HotrodService extends InfinispanHotrodService {
    }
 
    @ProvidesTrait
-   public Infinispan60HotRodCacheInfo creeateCacheInfo() {
+   public Infinispan60HotRodCacheInfo createCacheInfo() {
       return new Infinispan60HotRodCacheInfo(this);
    }
 
@@ -141,6 +141,14 @@ public class Infinispan60HotrodService extends InfinispanHotrodService {
       if (queryable != null) {
          queryable.registerProtofilesRemote();
       }
+   }
+
+   public Configuration getConfiguration() {
+      return configuration;
+   }
+
+   public void setRemoteCacheManagerConfiguration(Configuration configuration) {
+      managerNoReturn = new RemoteCacheManager(configuration, true);
    }
 
    // TODO: this is prepared for ReflexiveListConverter
