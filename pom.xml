@@ -244,6 +244,7 @@
                            </ac:else>
                         </ac:if>
                         <echo message="Plugin list: ${plugin.list}" />
+
                         <!-- Note: JCache needs to be here for schema generation, although it can't be used on its own -->
                         <ac:for list="${plugin.list}" param="plugin" xmlns:ac="antlib:net.sf.antcontrib">
                            <sequential>
@@ -322,6 +323,9 @@
                         <path id="core_and_extensions">
                            <fileset dir="${distribution.artifact}/lib" includes="*.jar" />
                         </path>
+                        <delete>
+                           <fileset dir="${distribution.artifact}/lib" includes="plugin-*.jar"/>
+                        </delete>
                         <java classname="org.radargun.config.BenchmarkSchemaGenerator" failonerror="true" classpathref="core_and_extensions">
                            <sysproperty key="log4j.configuration" value="file:///${basedir}/core/target/distribution/radargun-core-bin/radargun-core/conf/log4j.xml" />
                            <arg value="${distribution.artifact}/schema" />

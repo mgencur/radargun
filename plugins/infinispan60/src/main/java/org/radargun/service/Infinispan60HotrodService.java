@@ -149,6 +149,7 @@ public class Infinispan60HotrodService extends InfinispanHotrodService {
 
    public void setRemoteCacheManagerConfiguration(Configuration configuration) {
       managerNoReturn = new RemoteCacheManager(configuration, true);
+      managerForceReturn =  new RemoteCacheManager(configuration, true);
    }
 
    // TODO: this is prepared for ReflexiveListConverter

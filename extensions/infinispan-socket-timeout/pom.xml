@@ -22,12 +22,12 @@
       <dependency>
          <groupId>org.infinispan</groupId>
          <artifactId>infinispan-client-hotrod</artifactId>
-         <version>6.0.1.Final</version>
+         <version>7.0.3.Final</version>
          <optional>true</optional>
       </dependency>
       <dependency>
          <groupId>org.radargun</groupId>
-         <artifactId>plugin-infinispan60</artifactId>
+         <artifactId>plugin-infinispan70</artifactId>
          <version>${project.version}</version>
       </dependency>
       
